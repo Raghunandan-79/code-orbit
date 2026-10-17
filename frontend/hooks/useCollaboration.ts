@@ -249,6 +249,19 @@ export function useCollaboration(
     if (!roomId) return;
     clearTimers();
 
+    // Close any previous socket cleanly before creating a new one
+    if (wsRef.current) {
+      try {
+        wsRef.current.onclose = null;
+        wsRef.current.onerror = null;
+        wsRef.current.onmessage = null;
+        wsRef.current.close(1000, "Reconnecting");
+      } catch {
+        // Ignore
+      }
+      wsRef.current = null;
+    }
+
     const url = getRoomWsUrl(roomId);
     setPartialState({
       connectionState:
@@ -321,8 +334,17 @@ export function useCollaboration(
 
   const disconnect = useCallback(() => {
     clearTimers();
-    wsRef.current?.close(1000, "User left");
-    wsRef.current = null;
+    if (wsRef.current) {
+      try {
+        wsRef.current.onclose = null;
+        wsRef.current.onerror = null;
+        wsRef.current.onmessage = null;
+        wsRef.current.close(1000, "User left");
+      } catch {
+        // Ignore if already closing/closed
+      }
+      wsRef.current = null;
+    }
     setPartialState({ connectionState: "disconnected" });
   }, [clearTimers, setPartialState]);
 
@@ -360,8 +382,17 @@ export function useCollaboration(
     return () => {
       mountedRef.current = false;
       clearTimers();
-      wsRef.current?.close(1001, "Component unmounted");
-      wsRef.current = null;
+      if (wsRef.current) {
+        try {
+          wsRef.current.onclose = null;
+          wsRef.current.onerror = null;
+          wsRef.current.onmessage = null;
+          wsRef.current.close(1000, "Component unmounted");
+        } catch {
+          // Ignore if already closing/closed
+        }
+        wsRef.current = null;
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId]);
