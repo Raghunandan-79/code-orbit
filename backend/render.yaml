@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: syncraft-backend
+    runtime: docker
+    dockerfilePath: Dockerfile
+    plan: free
+    region: oregon
+    healthCheckPath: /healthz
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: ALLOWED_ORIGINS
+        value: "*" # Replace with your frontend Vercel URL in production, e.g. https://code-orbit.vercel.app
+      - key: MAX_ROOMS
+        value: 500
+      - key: MAX_PARTICIPANTS_PER_ROOM
+        value: 25
+      - key: ROOM_IDLE_EXPIRATION
+        value: 24h
