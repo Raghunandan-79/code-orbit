@@ -1,7 +1,10 @@
 # Build Stage
-FROM golang:1.24-alpine AS builder
+FROM golang:alpine AS builder
 
 WORKDIR /app
+
+# Enable automatic toolchain matching if required
+ENV GOTOOLCHAIN=auto
 
 # Install build dependencies
 RUN apk add --no-cache git ca-certificates tzdata
