@@ -29,7 +29,7 @@ type RoomSnapshot struct {
 // ParticipantSnapshot is an immutable view of a participant.
 type ParticipantSnapshot struct {
 	ID       string    `json:"participant_id"`
-	Nickname string    `json:"nickname,omitempty"`
+	Nickname string    `json:"nickname"`
 	JoinedAt time.Time `json:"joined_at"`
 }
 

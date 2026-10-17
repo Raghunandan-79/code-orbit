@@ -142,10 +142,14 @@ export function useCollaboration(
         case "room_joined": {
           const p = env.payload as RoomJoinedPayload;
           reconnectAttemptsRef.current = 0;
+          const sanitizedParticipants = (p.participants ?? []).map((pt) => ({
+            ...pt,
+            nickname: pt.nickname || "Guest",
+          }));
           setPartialState({
             connectionState: "connected",
             participantId: p.participant_id,
-            participants: p.participants ?? [],
+            participants: sanitizedParticipants,
             language: p.language,
             documentTitle: p.document_title,
             maxParticipants: p.max_participants,
@@ -262,7 +266,7 @@ export function useCollaboration(
       wsRef.current = null;
     }
 
-    const url = getRoomWsUrl(roomId);
+    const url = getRoomWsUrl(roomId, nickname);
     setPartialState({
       connectionState:
         reconnectAttemptsRef.current > 0 ? "reconnecting" : "connecting",

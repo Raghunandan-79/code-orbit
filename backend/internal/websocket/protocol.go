@@ -121,7 +121,7 @@ type SyncUpdatePayload struct {
 
 type ParticipantJoinedPayload struct {
 	ParticipantID string    `json:"participant_id"`
-	Nickname      string    `json:"nickname,omitempty"`
+	Nickname      string    `json:"nickname"`
 	JoinedAt      time.Time `json:"joined_at"`
 }
 

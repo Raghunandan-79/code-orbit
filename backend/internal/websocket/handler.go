@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/coder/websocket"
 	"github.com/gin-gonic/gin"
@@ -89,7 +90,10 @@ func (h *Handler) Upgrade(c *gin.Context) {
 		return
 	}
 
-	nickname := c.Query("nickname")
+	nickname := strings.TrimSpace(c.Query("nickname"))
+	if nickname == "" {
+		nickname = "Guest"
+	}
 	sinceSeqStr := c.Query("since_seq")
 	var sinceSeq uint64
 	if sinceSeqStr != "" {

@@ -70,8 +70,9 @@ export { ApiError };
  * Builds the WebSocket URL for a given room.
  * Converts http(s):// to ws(s):// automatically.
  */
-export function getRoomWsUrl(roomId: string): string {
+export function getRoomWsUrl(roomId: string, nickname?: string): string {
   const base = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080")
     .replace(/^http/, "ws");
-  return `${base}/api/v1/rooms/${encodeURIComponent(roomId)}/ws`;
+  const query = nickname ? `?nickname=${encodeURIComponent(nickname)}` : "";
+  return `${base}/api/v1/rooms/${encodeURIComponent(roomId)}/ws${query}`;
 }

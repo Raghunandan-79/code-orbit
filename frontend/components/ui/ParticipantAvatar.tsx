@@ -15,24 +15,29 @@ interface ParticipantAvatarProps {
   showName?: boolean;
 }
 
-function initials(name: string): string {
-  return name
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((w) => w[0]?.toUpperCase() ?? "")
-    .join("")
-    || "?";
+function initials(name?: string | null): string {
+  if (!name || typeof name !== "string") return "?";
+  const clean = name.trim();
+  if (!clean) return "?";
+  return (
+    clean
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((w) => w[0]?.toUpperCase() ?? "")
+      .join("") || "?"
+  );
 }
 
 export function ParticipantAvatar({
   nickname,
-  colorIndex,
+  colorIndex = 0,
   isYou = false,
   size = "md",
   showName = false,
 }: ParticipantAvatarProps) {
-  const color = CURSOR_COLORS[colorIndex % CURSOR_COLORS.length];
-  const abbr = initials(nickname);
+  const safeName = (nickname && typeof nickname === "string" && nickname.trim()) || "Guest";
+  const color = CURSOR_COLORS[Math.abs(colorIndex || 0) % CURSOR_COLORS.length];
+  const abbr = initials(safeName);
 
   const avatarSize = size === "sm" ? "w-7 h-7 text-[10px]" : "w-8 h-8 text-xs";
 
@@ -42,7 +47,7 @@ export function ParticipantAvatar({
         "flex items-center gap-2",
         showName && "min-w-0"
       )}
-      title={isYou ? `${nickname} (you)` : nickname}
+      title={isYou ? `${safeName} (you)` : safeName}
     >
       <div
         className={clsx(
@@ -67,7 +72,7 @@ export function ParticipantAvatar({
       </div>
       {showName && (
         <span className="text-xs text-[--fg-secondary] truncate">
-          {isYou ? `${nickname} (you)` : nickname}
+          {isYou ? `${safeName} (you)` : safeName}
         </span>
       )}
     </div>
@@ -80,7 +85,7 @@ export function ParticipantAvatarStack({
   currentParticipantId,
   maxVisible = 4,
 }: {
-  participants: Array<{ participant_id: string; nickname: string }>;
+  participants: Array<{ participant_id: string; nickname?: string }>;
   currentParticipantId?: string | null;
   maxVisible?: number;
 }) {
@@ -90,9 +95,9 @@ export function ParticipantAvatarStack({
   return (
     <div className="flex items-center -space-x-2" aria-label={`${participants.length} participants`}>
       {visible.map((p, i) => (
-        <div key={p.participant_id} style={{ zIndex: visible.length - i }}>
+        <div key={p.participant_id || i} style={{ zIndex: visible.length - i }}>
           <ParticipantAvatar
-            nickname={p.nickname}
+            nickname={p.nickname || "Guest"}
             colorIndex={i}
             isYou={p.participant_id === currentParticipantId}
             size="sm"
